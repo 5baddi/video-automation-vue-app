@@ -10,11 +10,13 @@
                                 <tab-content title="Choose template" :before-change="validateChooseTemplateStep">
                                     <VaChooseTemplate :selectedTemplate="selectedTemplate" @update="updateSelectedTemplate"/>
                                 </tab-content>
-                                <tab-content title="Upload medias">
-                                    <VaUploadMedias :template="templateMedias" :video="video"/>
+                                <tab-content title="Upload medias" :before-change="uploadTemplateInputsStep">
+                                    <VaUploadMedias :template="template" :video="video" :outputFileName="outputFileName" @update="updateTemplateInputs"/>
                                 </tab-content>
-                                <tab-content title="Download the video">
-                                    <VaGeneratedVideo/>
+                                <tab-content title="Download the video" :after-change="renderStep">
+                                    <div class="col-md-12 text-center">
+                                        <h4>Please wait until finish...</h4>
+                                    </div>
                                 </tab-content>
                             </form-wizard>
                         </div>
@@ -28,6 +30,7 @@
 <script>
 // CSS
 require('vue-form-wizard/dist/vue-form-wizard.min.css')
+require('vueperslides/dist/vueperslides.css')
 
 // Consts & Plugins & Components
 import {VA} from './va.js'
@@ -36,7 +39,6 @@ import {FormWizard, TabContent} from 'vue-form-wizard'
 // Components
 import VaChooseTemplate from './components/ChooseTemplate.vue'
 import VaUploadMedias from './components/UploadMedias.vue'
-import VaGeneratedVideo from './components/GeneratedVideo.vue'
 
 
 export default {
@@ -45,36 +47,86 @@ export default {
         FormWizard, 
         TabContent,
         VaChooseTemplate,
-        VaUploadMedias,
-        VaGeneratedVideo
+        VaUploadMedias
     },
     data(){
         return{
             selectedTemplate: null,
-            templateMedias: [],
-            video: {}
+            template: {},
+            video: [],
+            outputFileName: null
         }
     },
     methods: {
+        // Watch vars
         updateSelectedTemplate(selectedOne){
             this.selectedTemplate = selectedOne
         },
+        updateTemplateInputs(objData){
+            this.video = objData.video
+            this.outputFileName = objData.outputFileName
+        },
+
+        // Step One
         validateChooseTemplateStep() {
+            // Validate has been selected an video template
             if(this.selectedTemplate != null){
+                // Load template medias structure
                 this.$http.get(VA.API + 'templates/' + this.selectedTemplate)
                     .then(response => {
                         let content = response.data
-                        if(content.data != null)
-                            this.templateMedias = content.data
-                        else
-                            this.templateMedias = []
+                        if(content.data != null){
+                            this.template = content.data
+                            this.outputFileName = this.template.name
+
+                            let self = this;
+                            // Format the media model
+                            self.video = new Array(this.template.medias.length)
+                            $.each(this.template.medias, function(key, item){
+                                if(item.type !== 'image')
+                                    self.video[key] = item.default_value
+                                else
+                                    self.video[key] = null
+                            })
+                            this.video = self.video
+                        }else{
+                            this.template = {}
+                            this.video = []
+                            this.outputFileName = null
+                        }
                     })
 
                 return true
             }
 
             alert("Please choose a template!")
-            return false;
+            return false
+        },
+        // Step Two
+        uploadTemplateInputsStep(){
+            // TODO: Validation
+            if(this.video.length === this.template.medias.length && !this.video.includes(null) && this.outputFileName != null)
+                return true
+
+            alert("Should fill the required fields!")
+            return false
+        },
+        // Render step
+        renderStep(){
+            let formData = new FormData()
+            formData.append('template', this.template.id)
+            formData.append('name', this.outputFileName)
+            let self = this
+            $.each(this.template.medias, function(key, item){
+                formData.append(item.placeholder, self.video[key])
+            })
+
+            this.$http.post(VA.API2 + 'render', formData) 
+                .then(response => {
+                    let content = response.data
+                    if(response.status == 200 && content.data != null)
+                        console.log(content.job_id)
+                })
         }
     }
 }
