@@ -118,7 +118,11 @@ export default {
             formData.append('name', this.outputFileName)
             let self = this
             $.each(this.template.medias, function(key, item){
-                formData.append(item.placeholder, self.video[key])
+                let value = self.video[key]
+                if(item.type === 'color')
+                    value = self.video[key].hex
+
+                formData.append(item.placeholder, value)
             })
 
             this.$http.post(VA.API2 + 'render', formData) 
