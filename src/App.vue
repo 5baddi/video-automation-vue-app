@@ -15,8 +15,8 @@
                                 </tab-content>
                                 <tab-content title="Download the video" :after-change="renderStep">
                                     <div class="col-md-12 text-center">
-                                        <h4>Please wait until finish...</h4>
-                                        <video src="{{ outputURL }}" />
+                                        <h4>{{ outputFileName }}</h4>
+                                        <video v-if="isGenerated" :src="outputURL" />
                                     </div>
                                 </tab-content>
                             </form-wizard>
@@ -56,7 +56,8 @@ export default {
             template: {},
             video: [],
             outputFileName: null,
-            outputURL: null
+            outputURL: null,
+            isGenerated: false
         }
     },
     methods: {
@@ -127,11 +128,14 @@ export default {
                 formData.append(item.placeholder, value)
             })
 
+            let vue = this
             this.$http.post(VA.API2 + 'render', formData) 
                 .then(response => {
                     let content = response.data
-                    if(response.status == 200 && content != null)
+                    if(response.status == 200 && content != null){
+                        this.isGenerated = true
                         this.outputURL = content.output_url
+                    }
                 })
         }
     }
