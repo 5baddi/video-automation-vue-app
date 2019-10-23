@@ -16,6 +16,13 @@
                                 <tab-content title="Download the video" :after-change="renderStep">
                                     <div class="col-md-12 text-center">
                                         <h4>{{ outputFileName }}</h4>
+                                        <hr/>
+                                        <div class="progress" v-if="!isGenerated">
+                                            <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" :aria-valuenow="progressStatus"
+                                            aria-valuemin="0" aria-valuemax="100" :style="'width:' + progressStatus + '%'">
+                                                {{ progressStatus }}%
+                                            </div>
+                                        </div>
                                         <video v-if="isGenerated" :src="outputURL" />
                                     </div>
                                 </tab-content>
@@ -57,7 +64,8 @@ export default {
             video: [],
             outputFileName: null,
             outputURL: null,
-            isGenerated: false
+            isGenerated: false,
+            progressStatus: 0
         }
     },
     methods: {
@@ -133,8 +141,23 @@ export default {
                 .then(response => {
                     let content = response.data
                     if(response.status == 200 && content != null){
-                        this.isGenerated = true
-                        this.outputURL = content.output_url
+                        vue.progressStatus = 0
+                        vue.isGenerated = false
+                        vue.outputURL = content.output_url
+                        vue.outputFileName = content.output_name
+
+                        let properID = setInterval(() => {
+                            this.$http.get(VA.API2 + 'status/' + content.job_id) 
+                                .then(response => {
+                                    let content = response.data
+                                    if(response.status == 200 && content.data != null){
+                                        vue.progressStatus = content.data.progress
+                                    }
+
+                                    if(content.data.progress == 100)
+                                        clearInterval(properID)
+                                })
+                        }, 60000)
                     }
                 })
         }

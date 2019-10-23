@@ -1,28 +1,30 @@
 <template>
-    <div class="row">
+    <div class="row text-left">
         <div class="col-md-8">
-            <div class="col-md-12">
-                <!-- <img class="form-group" v-for="item in template.medias" :key="item.id" :src="item.thumbnail_url"/> -->
+            <!-- <div class="col-md-12">
+                <img class="form-group" v-for="item in template.medias" :key="item.id" :src="item.thumbnail_url"/>
                 <vueper-slides class="no-shadow" slide-image-inside :visible-slides="2" :slide-ratio="1/4" :dragging-distance="70">
                     <vueper-slide v-for="item in template.medias" :image="item.thumbnail_url" :key="item.id"></vueper-slide>
                 </vueper-slides>
-            </div>
-            <div class="col-md-8">
+            </div> -->
+            <div class="col-md-8 form">
                 <input type="hidden" :value="template.id"/>
+                <div class="form-group">
+                    <label>Video name</label>
+                    <input type="text" class="form-control" v-model="outputFileName" placeholder="Campaign 1"/>
+                </div>
                 <div class="form-group" v-for="(item, index) in template.medias" :key="item.id">
-                    <label>{{ item.placeholder }}</label>
+                    <label>{{ item.placeholder.replace(/_/g, ' ') }}</label>
                     <input v-if="item.type == 'text'" class="form-control" type="text" v-model="video[index]" required/>
                     <input v-if="item.type == 'image'" class="form-control" type="file" :name="index" @change="onFileChanged" required/>
-                    <Sketch v-if="item.type == 'color'" v-model="video[index]"/>
+                    <!-- <Sketch v-if="item.type == 'color'" v-model="video[index]"/> -->
+                    <input v-if="item.type == 'color'" class="form-control" type="color" v-model="video[index]"/>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="embed-responsive embed-responsive-1by1">
                 <video class="embed-responsive-item" controls :src="template.preview_url"/>
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control" v-model="outputFileName" placeholder="Video name"/>
             </div>
         </div>
     </div>
