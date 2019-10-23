@@ -16,6 +16,7 @@
                                 <tab-content title="Download the video" :after-change="renderStep">
                                     <div class="col-md-12 text-center">
                                         <h4>Please wait until finish...</h4>
+                                        <video src="{{ outputURL }}" />
                                     </div>
                                 </tab-content>
                             </form-wizard>
@@ -54,7 +55,8 @@ export default {
             selectedTemplate: null,
             template: {},
             video: [],
-            outputFileName: null
+            outputFileName: null,
+            outputURL: null
         }
     },
     methods: {
@@ -128,8 +130,8 @@ export default {
             this.$http.post(VA.API2 + 'render', formData) 
                 .then(response => {
                     let content = response.data
-                    if(response.status == 200 && content.data != null)
-                        console.log(content.job_id)
+                    if(response.status == 200 && content != null)
+                        this.outputURL = content.output_url
                 })
         }
     }
