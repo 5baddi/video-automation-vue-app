@@ -13,7 +13,7 @@
         </div>
         <div class="row bd-thumbs-container">
             <div class="col-md-4" style="margin-bottom:20px" v-for="item in customTemplates" :customTemplate="item" :key="item.id">
-                <img class="bd-va-thumb img-fluid" @click="selectedThumbChanged(item.id)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.thumbnail_url"/>
+                <img class="bd-va-thumb img-fluid" @mouseenter="switchPreview" @mouseout="switchPreview" @click="selectedThumbChanged(item.id)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.thumbnail_url" :data-thumbnail="item.thumbnail_url"/>
                 <p>{{ item.name }}</p>
             </div>
         </div>
@@ -64,6 +64,19 @@ export default {
         },
         selectedThumbChanged(value){
             this.$emit('update', value)
+        },
+        switchPreview(event){
+            if(event.target == null)
+                return
+
+            let splitedLink = event.target.src.split('.')
+            let extension = splitedLink[splitedLink.length - 1]
+
+            // Replace file extension to gif
+            if(extension != 'gif')
+                event.target.src = event.target.src.replace(extension, 'gif')
+            else
+                event.target.src = event.target.getAttribute('data-thumbnail')
         }
     }
 }
