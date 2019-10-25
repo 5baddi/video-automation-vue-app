@@ -15,15 +15,25 @@
                                 </tab-content>
                                 <tab-content title="Download the video" :after-change="renderStep">
                                     <div class="col-md-12 text-center">
-                                        <h4>{{ outputFileName }}</h4>
+                                        <h4>{{ (outputFileName != null && outputFileName != "") ? outputFileName.replace(/_/g, ' ') : "Something wrong!" }}</h4>
                                         <hr/>
-                                        <div class="progress" v-if="!isGenerated">
-                                            <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" :aria-valuenow="progressStatus"
-                                            aria-valuemin="0" aria-valuemax="100" :style="'width:' + progressStatus + '%'">
-                                                {{ progressStatus }}%
+                                        <div class="col-md-12" v-show="!isGenerated">
+                                            <p>Please wait until rendering is complete ...</p>
+                                            <font-awesome-icon icon="spinner" size="2x" spin/>
+                                            <div class="progress text-center" style="margin:20px">
+                                                <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" :aria-valuenow="progressStatus"
+                                                aria-valuemin="0" aria-valuemax="100" :style="'width:' + progressStatus + '%'">
+                                                    {{ progressStatus }}%
+                                                </div>
                                             </div>
                                         </div>
-                                        <video v-if="isGenerated" :src="outputURL" />
+                                        <div class="col-md-12" v-show="isGenerated">
+                                            <!-- <div class="embed-responsive embed-responsive-16by9" v-html="outputVideo" style="margin-bottom:20px"></div> -->
+                                            <div class="embed-responsive embed-responsive-16by9" style="margin-bottom:20px">
+                                                <video controls :src="outputURL"/>
+                                            </div>
+                                            <a class="btn btn-download" :href="outputURL" target="_blank" download>Download video</a>
+                                        </div>
                                     </div>
                                 </tab-content>
                             </form-wizard>
@@ -62,10 +72,11 @@ export default {
             selectedTemplate: null,
             template: {},
             video: [],
-            outputFileName: null,
-            outputURL: null,
+            outputFileName: "",
+            outputURL: "",
             isGenerated: false,
-            progressStatus: 0
+            progressStatus: 0,
+            outputVideo: ""
         }
     },
     methods: {
@@ -103,7 +114,7 @@ export default {
                         }else{
                             this.template = {}
                             this.video = []
-                            this.outputFileName = null
+                            this.outputFileName = ""
                         }
                     })
 
@@ -116,7 +127,7 @@ export default {
         // Step Two
         uploadTemplateInputsStep(){
             // TODO: Validation
-            if(this.video.length === this.template.medias.length && !this.video.includes(null) && this.outputFileName != null)
+            if(this.video.length === this.template.medias.length && !this.video.includes(null) && this.outputFileName != null && this.outputFileName != "")
                 return true
 
             alert("Should fill the required fields!")
@@ -143,19 +154,27 @@ export default {
                     if(response.status == 200 && content != null){
                         vue.progressStatus = 0
                         vue.isGenerated = false
-                        vue.outputURL = content.output_url
+                        vue.outputURL = ""
                         vue.outputFileName = content.output_name
 
                         let properID = setInterval(() => {
                             this.$http.get(VA.API2 + 'status/' + content.job_id) 
                                 .then(response => {
-                                    let content = response.data
-                                    if(response.status == 200 && content.data != null){
-                                        vue.progressStatus = content.data.progress
+                                    let _content = response.data
+                                    if(response.status == 200 && _content.data != null){
+                                        vue.progressStatus = _content.data.progress
                                     }
 
-                                    if(content.data.progress == 100)
+                                    if(_content.data.progress == 100){
                                         clearInterval(properID)
+
+                                        // Show the generated video
+                                        // let videoDom = document.createElement('video')
+                                        // videoDom.src = content.output_url
+                                        // vue.outputVideo = videoDom.innerHTML
+                                        vue.outputURL = content.outputURL
+                                        vue.isGenerated = true
+                                    }
                                 })
                         }, 60000)
                     }
@@ -193,5 +212,9 @@ export default {
     }
     .no-padding{
         padding: 0px !important;
+    }
+    .btn-download{
+        background-color: #83bf54 !important;
+        color: white !important;
     }
 </style>

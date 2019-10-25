@@ -13,8 +13,8 @@
         </div>
         <div class="row bd-thumbs-container">
             <div class="col-md-4" style="margin-bottom:20px" v-for="item in customTemplates" :customTemplate="item" :key="item.id" @mouseover="switchPreview(item.id)" @mouseleave="switchPreview(null)">
-                <img class="bd-va-thumb img-fluid" v-show="playedOne == item.id" @click="selectedThumbChanged(item.id)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.gif_url"/>
-                <img class="bd-va-thumb img-fluid" v-show="playedOne != item.id" @click="selectedThumbChanged(item.id)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.thumbnail_url"/>
+                <img class="bd-va-thumb img-fluid" v-show="playedOne == item.id" @click="selectedThumbChanged(item)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.gif_url"/>
+                <img class="bd-va-thumb img-fluid" v-show="playedOne != item.id" @click="selectedThumbChanged(item)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.thumbnail_url"/>
                 <p>{{ item.name }}</p>
             </div>
         </div>
@@ -53,7 +53,7 @@ export default {
     methods: {
         loadCustomTemplates(rotation){
             this.rotation = rotation
-            this.selectedTemplate = null
+            this.selectedThumbChanged(null)
 
             this.$http.get(VA.API + 'templates/thumbnails/' + rotation)
             .then(response => {
@@ -64,12 +64,22 @@ export default {
                     this.customTemplates = []
             })
         },
-        selectedThumbChanged(value){
-            this.$emit('update', value)
+        selectedThumbChanged(template){
+            let selectedOne = null
+            // Only enabled template can be used
+            if(template != null){
+                if(template.enabled == 1)
+                    selectedOne = template.id
+                else
+                    alert("This template not for use! Please choose another one")
+            }
+
+
+            this.selectedTemplate = selectedOne
+            this.$emit('update', selectedOne)
         },
         switchPreview(id){
             this.playedOne = id
-            console.log(this.playedOne)
             // if(event.target == null)
             //     return
 
