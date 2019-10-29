@@ -13,8 +13,8 @@
         </div>
         <div class="row bd-thumbs-container">
             <div class="col-md-4" style="margin-bottom:20px" v-for="item in customTemplates" :customTemplate="item" :key="item.id" @mouseover="switchPreview(item.id)" @mouseleave="switchPreview(null)">
-                <img class="bd-va-thumb img-fluid" v-show="playedOne == item.id" @click="selectedThumbChanged(item)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.gif_url"/>
-                <img class="bd-va-thumb img-fluid" v-show="playedOne != item.id" @click="selectedThumbChanged(item)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.thumbnail_url"/>
+                <img class="bd-va-thumb img-fluid" v-show="playedOne == item.id && item.gif_url" @click="selectedThumbChanged(item)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.gif_url"/>
+                <img class="bd-va-thumb img-fluid" v-show="playedOne != item.id || !item.gif_url" @click="selectedThumbChanged(item)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.thumbnail_url"/>
                 <p>{{ item.name }}</p>
             </div>
         </div>
