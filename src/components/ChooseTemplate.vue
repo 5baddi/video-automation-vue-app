@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="row bd-thumbs-container">
-            <div class="col-md-4" style="margin-bottom:20px" v-for="item in customTemplates" :customTemplate="item" :key="item.id" @mouseover="switchPreview(item.id)" @mouseleave="switchPreview(null)">
+            <div class="col-md-4" style="margin-bottom:20px" v-for="item in customTemplates" :customTemplate="item" :key="item.id" @mouseover="switchPreview(item.id)" @mouseleave="switchPreview(-1)">
                 <img class="bd-va-thumb img-fluid" v-show="playedOne == item.id && item.gif_url" @click="selectedThumbChanged(item)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.gif_url"/>
                 <img class="bd-va-thumb img-fluid" v-show="playedOne != item.id || !item.gif_url" @click="selectedThumbChanged(item)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.thumbnail_url"/>
                 <p>{{ item.name }}</p>
@@ -31,13 +31,16 @@ export default {
         
     },
     props: {
-        selectedTemplate: Number
+        selectedTemplate: {
+            type: Number,
+            default: -1
+        }
     },
     data(){
         return {
             customTemplates : [],
             rotation: 'square',
-            playedOne: null
+            playedOne: -1
         }
     },
     mounted(){
@@ -53,7 +56,7 @@ export default {
     methods: {
         loadCustomTemplates(rotation){
             this.rotation = rotation
-            this.selectedThumbChanged(null)
+            this.selectedThumbChanged(-1)
 
             this.$http.get(VA.API + 'templates/thumbnails/' + rotation)
             .then(response => {
@@ -65,9 +68,9 @@ export default {
             })
         },
         selectedThumbChanged(template){
-            let selectedOne = null
+            let selectedOne = -1
             // Only enabled template can be used
-            if(template != null){
+            if(template != -1){
                 if(template.enabled == 1)
                     selectedOne = template.id
                 else

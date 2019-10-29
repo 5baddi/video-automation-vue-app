@@ -30,7 +30,7 @@
                                         <div class="col-md-12" v-show="isGenerated">
                                             <!-- <div class="embed-responsive embed-responsive-16by9" v-html="outputVideo" style="margin-bottom:20px"></div> -->
                                             <div class="embed-responsive embed-responsive-16by9" style="margin-bottom:20px">
-                                                <video controls :src="outputURL"/>
+                                                <video controls muted id="outputVideo" ref="outputVideo" :src="outputURL"/>
                                             </div>
                                             <a class="btn btn-download" :href="outputURL" target="_blank" download>Download video</a>
                                         </div>
@@ -69,14 +69,14 @@ export default {
     },
     data(){
         return{
-            selectedTemplate: null,
+            selectedTemplate: -1,
             template: {},
             video: [],
             outputFileName: "",
-            outputURL: "",
+            outputURL: "#",
             isGenerated: false,
-            progressStatus: 0,
-            outputVideo: ""
+            progressStatus: 0
+            // outputVideo: ""
         }
     },
     methods: {
@@ -86,13 +86,13 @@ export default {
         },
         updateTemplateInputs(objData){
             this.video = objData.video
-            this.outputFileName = objData.outputFileName
+            this.outputFileName = objData.outputName
         },
 
         // Step One
         validateChooseTemplateStep() {
             // Validate has been selected an video template
-            if(this.selectedTemplate != null){
+            if(this.selectedTemplate != -1){
                 // Load template medias structure
                 this.$http.get(VA.API + 'templates/' + this.selectedTemplate)
                     .then(response => {
@@ -147,34 +147,38 @@ export default {
                 formData.append(item.placeholder, value)
             })
 
-            let vue = this
+            // let vue = this
             this.$http.post(VA.API2 + 'render', formData) 
                 .then(response => {
                     let content = response.data
                     if(response.status == 200 && content != null){
-                        vue.progressStatus = 0
-                        vue.isGenerated = false
-                        vue.outputURL = ""
-                        vue.outputFileName = content.output_name
+                        this.progressStatus = 0
+                        this.isGenerated = false
+                        this.outputURL = "#"
+                        this.outputFileName = content.output_name
 
                         let properID = setInterval(() => {
                             this.$http.get(VA.API2 + 'status/' + content.job_id) 
                                 .then(response => {
                                     let _content = response.data
                                     if(response.status == 200 && _content.data != null){
-                                        vue.progressStatus = _content.data.progress
+                                        this.progressStatus = _content.data.progress
                                     }
 
                                     if(_content.data.progress == 100){
                                         clearInterval(properID)
+                                        this.outputURL = content.output_url
+                                        this.isGenerated = true
+                                        this.$refs.outputVideo.pause()
+                                        this.$refs.outputVideo.load()
+                                    }
 
                                         // Show the generated video
                                         // let videoDom = document.createElement('video')
                                         // videoDom.src = content.output_url
-                                        // vue.outputVideo = videoDom.innerHTML
-                                        vue.outputURL = content.outputURL
-                                        vue.isGenerated = true
-                                    }
+                                        // this.outputVideo = videoDom.innerHTML
+                                        // this.outputURL = content.outputURL
+                                        // this.isGenerated = true
                                 })
                         }, 60000)
                     }

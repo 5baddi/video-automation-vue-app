@@ -45,7 +45,10 @@ export default {
     props: {
         template: Object,
         video: Array,
-        outputFileName: String
+        outputFileName: {
+            type: String,
+            default: ""
+        }
     },
     methods: {
         onFileChanged(e){
@@ -60,7 +63,7 @@ export default {
     },
     watch: {
         video: function(newVal, oldVal){
-            this.$emit('update', {video: this.video, outputFileName: this.outputFileName})
+            this.$emit('update', {video: this.video, outputName: this.outputFileName})
         }
     },
 }
