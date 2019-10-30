@@ -167,7 +167,7 @@ export default {
 
                                     if(_content.data.progress == 100){
                                         clearInterval(properID)
-                                        this.outputURL = VA.CDN + content.created_at + '/' + content.output_name
+                                        this.outputURL = VA.CDN + _content.data.template_id + '/' + _content.data.output_name
                                         this.isGenerated = true
                                         this.$refs.outputVideo.pause()
                                         this.$refs.outputVideo.load()
