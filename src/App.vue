@@ -32,7 +32,7 @@
                                             <div class="embed-responsive embed-responsive-16by9" style="margin-bottom:20px">
                                                 <video controls muted id="outputVideo" ref="outputVideo" :src="outputURL"/>
                                             </div>
-                                            <a class="btn btn-download" :href="outputURL" target="_blank" download>Download video</a>
+                                            <a class="btn btn-download" :href="outputURL" download>Download video</a>
                                         </div>
                                     </div>
                                 </tab-content>
@@ -167,7 +167,7 @@ export default {
 
                                     if(_content.data.progress == 100){
                                         clearInterval(properID)
-                                        this.outputURL = content.output_url
+                                        this.outputURL = VA.CDN + content.created_at + '/' + content.output_name
                                         this.isGenerated = true
                                         this.$refs.outputVideo.pause()
                                         this.$refs.outputVideo.load()
