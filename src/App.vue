@@ -147,6 +147,11 @@ export default {
                 formData.append(item.placeholder, value)
             })
 
+            formData.forEach(function(v, key){
+                console.log(key, v)
+            })
+            return
+
             // let vue = this
             this.$http.post(VA.API2 + 'render', formData) 
                 .then(response => {

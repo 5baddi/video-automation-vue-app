@@ -11,7 +11,7 @@
                 <input type="hidden" :value="template.id"/>
                 <div class="form-group">
                     <label>Video name</label>
-                    <input type="text" class="form-control" v-model="outputFileName" placeholder="Campaign 1"/>
+                    <input type="text" class="form-control" v-model="outputFileName" placeholder="First campaign"/>
                 </div>
                 <div class="form-group" v-for="(item, index) in template.medias" :key="item.id">
                     <label>{{ item.placeholder.replace(/_/g, ' ') }}</label>
@@ -63,6 +63,7 @@ export default {
     },
     watch: {
         video: function(newVal, oldVal){
+            console.log(this.outputFileName);
             this.$emit('update', {video: this.video, outputName: this.outputFileName})
         }
     },
