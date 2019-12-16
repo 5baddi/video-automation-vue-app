@@ -62,8 +62,11 @@ export default {
         }
     },
     watch: {
+        outputFileName: function(newVal, oldVal){
+            this.outputFileName = newVal
+            this.$emit('update', {video: this.video, outputName: newVal})
+        },
         video: function(newVal, oldVal){
-            console.log(this.outputFileName);
             this.$emit('update', {video: this.video, outputName: this.outputFileName})
         }
     },

@@ -30,9 +30,9 @@
                                         <div class="col-md-12" v-show="isGenerated">
                                             <!-- <div class="embed-responsive embed-responsive-16by9" v-html="outputVideo" style="margin-bottom:20px"></div> -->
                                             <div class="embed-responsive embed-responsive-16by9" style="margin-bottom:20px">
-                                                <video controls muted id="outputVideo" ref="outputVideo" :src="outputURL"/>
+                                                <video controls muted id="outputVideo" ref="outputVideo" name="outputVideo" :src="outputURL"/>
                                             </div>
-                                            <a class="btn btn-download" :href="outputURL" download>Download video</a>
+                                            <a class="btn btn-download" :href="downloadURL" download>Download video</a>
                                         </div>
                                     </div>
                                 </tab-content>
@@ -74,6 +74,7 @@ export default {
             video: [],
             outputFileName: "",
             outputURL: "#",
+            downloadURL: "#",
             isGenerated: false,
             progressStatus: 0
             // outputVideo: ""
@@ -99,7 +100,7 @@ export default {
                         let content = response.data
                         if(content.data != null){
                             this.template = content.data
-                            this.outputFileName = this.template.name
+                            this.outputFileName = this.template.name.replace(/_/g, ' ')
 
                             let self = this;
                             // Format the media model
@@ -142,15 +143,10 @@ export default {
             $.each(this.template.medias, function(key, item){
                 let value = self.video[key]
                 if(item.type === 'color')
-                    value = self.video[key].hex
+                    value = self.video[key]
 
                 formData.append(item.placeholder, value)
             })
-
-            formData.forEach(function(v, key){
-                console.log(key, v)
-            })
-            return
 
             // let vue = this
             this.$http.post(VA.API2 + 'render', formData) 
@@ -172,7 +168,8 @@ export default {
 
                                     if(_content.data.progress == 100){
                                         clearInterval(properID)
-                                        this.outputURL = VA.CDN + 'download/' + _content.data.template_id + '/' + _content.data.file_name
+                                        this.outputURL = _content.data.output_url;
+                                        this.downloadURL = VA.CDN + 'download/' + _content.data.template_id + '/' + _content.data.output_url.substring(_content.data.output_url.lastIndexOf('/') + 1)
                                         this.isGenerated = true
                                         this.$refs.outputVideo.pause()
                                         this.$refs.outputVideo.load()
