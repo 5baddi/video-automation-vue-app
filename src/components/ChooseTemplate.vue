@@ -5,17 +5,20 @@
                 <a class="tab-url" href="javascript:void(0)" :class="{ 'tab-url-active' : rotation == 'square' }" @click="loadCustomTemplates('square')">Square</a>
             </div>
             <div class="col-md-4">
-                <a class="tab-url" href="javascript:void(0)" :class="{ 'tab-url-active' : rotation == 'portrait' }" @click="loadCustomTemplates('portrait')">Portrait</a>
+                <a class="tab-url" href="javascript:void(0)" :class="{ 'tab-url-active' : rotation == 'landscape' }" @click="loadCustomTemplates('landscape')">Landscape</a>
             </div>
             <div class="col-md-4">
-                <a class="tab-url" href="javascript:void(0)" :class="{ 'tab-url-active' : rotation == 'landscape' }" @click="loadCustomTemplates('landscape')">Landscape</a>
+                <a class="tab-url" href="javascript:void(0)" :class="{ 'tab-url-active' : rotation == 'portrait' }" @click="loadCustomTemplates('portrait')">Portrait</a>
             </div>
         </div>
         <div class="row bd-thumbs-container">
-            <div class="col-md-4" style="margin-bottom:20px" v-for="item in customTemplates" :customTemplate="item" :key="item.id" @mouseover="switchPreview(item.id)" @mouseleave="switchPreview(-1)">
+            <div class="col-md-4" style="margin-bottom:20px" v-for="item in customTemplates" :class="{'col-md-6' : item.rotation == 'landscape'}" :customTemplate="item" :key="item.id" @mouseover="switchPreview(item.id)" @mouseleave="switchPreview(-1)">
                 <img class="bd-va-thumb img-fluid" v-show="playedOne == item.id && item.gif_url" @click="selectedThumbChanged(item)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.gif_url"/>
                 <img class="bd-va-thumb img-fluid" v-show="playedOne != item.id || !item.gif_url" @click="selectedThumbChanged(item)" :class="{'bd-va-thumb-selected' : selectedTemplate == item.id}" :src="item.thumbnail_url"/>
                 <p>{{ item.name }}</p>
+            </div>
+            <div class="col-md-12 text-center" v-if="!customTemplates || customTemplates.length == 0">
+                <span class="text-muted">No templates for this rotation for the moment!</span>
             </div>
         </div>
     </div>
