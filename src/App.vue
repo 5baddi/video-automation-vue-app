@@ -18,9 +18,9 @@
                                         <h4>{{ (outputFileName != null && outputFileName != "") ? outputFileName.replace(/_/g, ' ') : "Something wrong!" }}</h4>
                                         <hr/>
                                         <div class="col-md-12" v-show="!isGenerated">
-                                            <p>Please wait until rendering is complete ...</p>
-                                            <font-awesome-icon icon="spinner" size="2x" spin/>
-                                            <div class="progress text-center" style="margin:20px">
+                                            <p id="outputMessage" ref="outputMessage">Please wait until rendering is complete ...</p>
+                                            <font-awesome-icon v-show="onProgress" icon="spinner" size="2x" spin/>
+                                            <div v-show="onProgress" class="progress text-center" style="margin:20px">
                                                 <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" :aria-valuenow="progressStatus"
                                                 aria-valuemin="0" aria-valuemax="100" :style="'width:' + progressStatus + '%'">
                                                     {{ progressStatus }}%
@@ -76,7 +76,8 @@ export default {
             outputURL: "#",
             downloadURL: "#",
             isGenerated: false,
-            progressStatus: 0
+            progressStatus: 0,
+            onProgress: false
             // outputVideo: ""
         }
     },
@@ -128,10 +129,12 @@ export default {
         // Step Two
         uploadTemplateInputsStep(){
             // TODO: Validation
-            if(this.video.length === this.template.medias.length && !this.video.includes(null) && this.outputFileName != null && this.outputFileName != "")
+            // if(this.video.length === this.template.medias.length && !this.video.includes(null) && this.outputFileName != null && this.outputFileName != "")
+            if(this.outputFileName != null && this.outputFileName != "")
                 return true
 
-            alert("Should fill the required fields!")
+            // alert("Should fill the required fields!")
+            alert("Should set the video output name!")
             return false
         },
         // Render step
@@ -155,6 +158,7 @@ export default {
                     if(response.status == 200 && content != null){
                         this.progressStatus = 0
                         this.isGenerated = false
+                        this.onProgress = true
                         this.outputURL = "#"
                         this.outputFileName = content.output_name
 
@@ -175,6 +179,14 @@ export default {
                                         this.$refs.outputVideo.load()
                                     }
 
+                                    // On error
+                                    if(_content.data.status == 'error'){
+                                        console.log("here")
+                                        clearInterval(properID)
+                                        this.onProgress = false
+                                        this.$refs.outputMessage.innerText = _content.data.message
+                                        this.$refs.outputMessage.style.color = "red"
+                                    }
                                         // Show the generated video
                                         // let videoDom = document.createElement('video')
                                         // videoDom.src = content.output_url
