@@ -173,7 +173,7 @@ export default {
                                     if(_content.data.progress == 100){
                                         clearInterval(properID)
                                         this.outputURL = _content.data.output_url;
-                                        this.downloadURL = VA.CDN + 'download/' + _content.data.template_id + '/' + _content.data.output_url.substring(_content.data.output_url.lastIndexOf('/') + 1)
+                                        this.downloadURL = VA.CDN + 'download/' + _content.data.id + '/' + _content.data.output_url.substring(_content.data.output_url.lastIndexOf('/') + 1)
                                         this.isGenerated = true
                                         this.$refs.outputVideo.pause()
                                         this.$refs.outputVideo.load()
