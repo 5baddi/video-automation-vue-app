@@ -42,12 +42,12 @@ export default {
     data(){
         return {
             customTemplates : [],
-            rotation: 'square',
+            rotation: 'landscape',
             playedOne: -1
         }
     },
     mounted(){
-        this.$http.get(VA.API + 'templates/thumbnails/square')
+        this.$http.get(VA.API + 'templates/thumbnails/landscape')
             .then(response => {
                 let content = response.data
                 if(content.data != null)
