@@ -2,10 +2,10 @@
     <div>
         <div class="row" style="background:#EBEFF2;padding:8px;">
             <div class="col-md-4">
-                <a class="tab-url" href="javascript:void(0)" :class="{ 'tab-url-active' : rotation == 'square' }" @click="loadCustomTemplates('square')">Square</a>
+                <a class="tab-url" href="javascript:void(0)" :class="{ 'tab-url-active' : rotation == 'landscape' }" @click="loadCustomTemplates('landscape')">Landscape</a>
             </div>
             <div class="col-md-4">
-                <a class="tab-url" href="javascript:void(0)" :class="{ 'tab-url-active' : rotation == 'landscape' }" @click="loadCustomTemplates('landscape')">Landscape</a>
+                <a class="tab-url" href="javascript:void(0)" :class="{ 'tab-url-active' : rotation == 'square' }" @click="loadCustomTemplates('square')">Square</a>
             </div>
             <div class="col-md-4">
                 <a class="tab-url" href="javascript:void(0)" :class="{ 'tab-url-active' : rotation == 'portrait' }" @click="loadCustomTemplates('portrait')">Portrait</a>
